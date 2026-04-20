@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Marc & Shelby — Moving In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --cream: #F7F4EE;
+    --warm-white: #FDFBF7;
+    --ink: #1C1A17;
+    --ink-light: #6B6560;
+    --ink-faint: #B8B3AB;
+    --accent: #C17F45;
+    --accent-light: #F2E8DA;
+    --accent-dark: #8B5A2B;
+    --green: #4A7C59;
+    --green-light: #E4EFE8;
+    --blue: #3A6E8C;
+    --blue-light: #E3EEF4;
+    --red: #B85C4A;
+    --red-light: #F5E8E5;
+    --border: #E4DED5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--warm-white); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 60px;
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+  .nav-logo span { color: var(--accent); }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 20px; border: none; background: transparent; color: var(--ink-light); cursor: pointer; transition: all 0.15s; }
+  .nav-tab:hover { background: var(--cream); color: var(--ink); }
+  .nav-tab.active { background: var(--ink); color: var(--warm-white); }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); display: inline-block; margin-right: 6px; transition: background 0.3s; }
+  .sync-dot.live { background: var(--green); }
+  .sync-dot.saving { background: var(--accent); animation: pulse 0.6s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
+  .nav-right { display: flex; align-items: center; font-size: 13px; color: var(--ink-light); }
+
+  .hero { padding: 3rem 2rem 2rem; max-width: 1100px; margin: 0 auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+  .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 58px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+  .hero-title em { color: var(--accent); font-style: italic; }
+  .hero-sub { font-size: 15px; color: var(--ink-light); margin-top: 10px; max-width: 400px; line-height: 1.6; }
+  .stats-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .stat-pill { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; padding: 12px 18px; min-width: 100px; text-align: center; }
+  .stat-pill .num { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1; }
+  .stat-pill .lbl { font-size: 11px; color: var(--ink-light); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-pill.green .num { color: var(--green); }
+  .stat-pill.amber .num { color: var(--accent); }
+  .stat-pill.red .num { color: var(--red); }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem 4rem; }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeUp 0.2s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)} }
+
+  .loading { text-align: center; padding: 4rem; color: var(--ink-light); font-size: 15px; }
+  .loading::after { content:''; display:inline-block; width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin 0.7s linear infinite; margin-left:10px; vertical-align:middle; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+
+  .room-nav { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; padding-top: 1rem; }
+  .room-btn { font-size: 13px; font-weight: 500; padding: 7px 16px; border-radius: 20px; border: 1px solid var(--border); background: var(--warm-white); color: var(--ink-light); cursor: pointer; transition: all 0.15s; }
+  .room-btn:hover { border-color: var(--ink-faint); color: var(--ink); }
+  .room-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .room-section { display: none; }
+  .room-section.active { display: block; }
+  .room-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+  .room-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .room-meta { font-size: 13px; color: var(--ink-light); }
+  .col-headers { display: grid; grid-template-columns: 1fr 130px 140px 140px 38px; gap: 12px; padding: 6px 16px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); }
+
+  .item-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
+  .item-main { display: grid; grid-template-columns: 1fr 130px 140px 140px 38px; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; }
+  .item-main:hover { background: var(--cream); }
+  .item-name-text { font-size: 14px; font-weight: 500; }
+  .badge { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-have { background: var(--green-light); color: var(--green); }
+  .badge-buy { background: var(--accent-light); color: var(--accent-dark); }
+  .badge-tbd { background: var(--cream); color: var(--ink-faint); border: 1px solid var(--border); }
+  .item-select { font-size: 12px; padding: 5px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--cream); color: var(--ink); width: 100%; }
+  .item-select:focus { outline: none; border-color: var(--accent); }
+  .chevron { width: 20px; height: 20px; color: var(--ink-faint); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+  .item-card.open .chevron { transform: rotate(180deg); }
+  .item-expand { display: none; padding: 0 16px 14px; border-top: 1px solid var(--border); }
+  .item-card.open .item-expand { display: block; }
+  .options-header { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); margin: 12px 0 8px; }
+  .option-row { display: grid; grid-template-columns: 1fr 90px 110px 80px 32px; gap: 10px; align-items: center; background: var(--cream); border-radius: 8px; padding: 9px 12px; font-size: 13px; margin-bottom: 6px; }
+  .option-name { font-weight: 500; }
+  .option-price, .option-store { color: var(--ink-light); }
+  .option-link a { color: var(--accent); text-decoration: none; font-size: 12px; }
+  .option-link a:hover { text-decoration: underline; }
+  .btn-del { background: none; border: none; cursor: pointer; color: var(--ink-faint); font-size: 16px; border-radius: 4px; padding: 2px 6px; }
+  .btn-del:hover { background: var(--red-light); color: var(--red); }
+  .add-option-row { display: grid; grid-template-columns: 1fr 90px 110px 80px auto; gap: 8px; margin-top: 6px; align-items: center; }
+  .add-option-row input { font-size: 12px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--ink); width: 100%; }
+  .add-option-row input:focus { outline: none; border-color: var(--accent); }
+  .btn-add-option { font-size: 12px; font-weight: 500; padding: 7px 12px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+  .btn-add-option:hover { background: var(--accent-dark); }
+  .no-options { font-size: 13px; color: var(--ink-faint); font-style: italic; padding: 4px 0 8px; }
+  textarea.notes-area { width: 100%; margin-top: 10px; padding: 8px 10px; font-size: 13px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 8px; background: var(--cream); color: var(--ink); resize: vertical; min-height: 52px; }
+  textarea.notes-area:focus { outline: none; border-color: var(--accent); }
+
+  .purchases-layout { display: grid; grid-template-columns: 1fr 300px; gap: 1.5rem; padding-top: 1rem; }
+  .card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-header h3 { font-size: 15px; font-weight: 500; }
+  .card-header span { font-size: 13px; color: var(--ink-light); }
+  .purchase-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .purchase-table th { text-align: left; padding: 10px 20px; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-light); background: var(--cream); border-bottom: 1px solid var(--border); }
+  .purchase-table td { padding: 11px 20px; border-bottom: 1px solid var(--border); }
+  .purchase-table tr:last-child td { border-bottom: none; }
+  .purchase-table tbody tr:hover td { background: var(--cream); }
+  .who-marc { color: var(--blue); font-weight: 500; }
+  .who-shelby { color: var(--accent-dark); font-weight: 500; }
+  .who-both { color: var(--green); font-weight: 500; }
+  tfoot td { font-weight: 500; background: var(--cream) !important; font-size: 14px; padding: 12px 20px; border-top: 1px solid var(--border); }
+  .add-purchase { padding: 14px 20px; background: var(--cream); border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 90px 100px 80px; gap: 8px; }
+  .add-purchase input, .add-purchase select { font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--border); background: white; color: var(--ink); }
+  .add-purchase input:focus, .add-purchase select:focus { outline: none; border-color: var(--accent); }
+  .btn-add-purchase { font-size: 13px; font-weight: 500; padding: 8px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; }
+  .btn-add-purchase:hover { background: var(--accent-dark); }
+  .balance-card { padding: 20px; }
+  .balance-person { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .person-name { font-size: 14px; font-weight: 500; }
+  .person-amount { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+  .person-marc .person-amount { color: var(--blue); }
+  .person-shelby .person-amount { color: var(--accent-dark); }
+  .balance-bar { height: 8px; border-radius: 4px; background: var(--border); overflow: hidden; margin-bottom: 16px; }
+  .balance-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--accent)); border-radius: 4px; transition: width 0.5s; }
+  .balance-owed { background: var(--accent-light); border-radius: 10px; padding: 12px 14px; font-size: 13px; text-align: center; color: var(--accent-dark); line-height: 1.5; }
+  .balance-owed strong { display: block; font-size: 18px; font-weight: 700; }
+
+  .shopping-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; padding-top: 1rem; }
+  .shop-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .shop-item-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .shop-room { font-size: 12px; color: var(--ink-light); margin-bottom: 10px; }
+  .shop-option { display: flex; align-items: center; justify-content: space-between; background: var(--cream); border-radius: 8px; padding: 8px 11px; margin-bottom: 6px; }
+  .shop-option-name { font-size: 13px; font-weight: 500; }
+  .shop-option-store { font-size: 12px; color: var(--ink-light); }
+  .shop-option-price { font-size: 13px; font-weight: 500; color: var(--accent-dark); }
+  .shop-option-link a { font-size: 11px; color: var(--accent); text-decoration: none; }
+  .no-shop-options { font-size: 13px; color: var(--ink-faint); font-style: italic; }
+  .shop-section-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-light); padding: 1rem 0 0.5rem; grid-column: 1/-1; }
+
+  .error-banner { background: var(--red-light); color: var(--red); border-radius: 8px; padding: 12px 16px; font-size: 13px; margin-bottom: 1rem; display: none; }
+  .error-banner.show { display: block; }
+
+  @media (max-width: 768px) {
+    .hero { flex-direction: column; align-items: flex-start; }
+    .item-main { grid-template-columns: 1fr 120px 38px; }
+    .item-main > :nth-child(3), .item-main > :nth-child(4) { display: none; }
+    .col-headers { display: none; }
+    .purchases-layout { grid-template-columns: 1fr; }
+    .add-purchase { grid-template-columns: 1fr 90px 80px; }
+    .add-purchase > :nth-child(3) { display: none; }
+    .add-option-row { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Marc <span>&</span> Shelby</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('rooms')">Rooms</button>
+    <button class="nav-tab" onclick="showView('shopping')">Shopping list</button>
+    <button class="nav-tab" onclick="showView('purchases')">Purchases</button>
+  </div>
+  <div class="nav-right"><span class="sync-dot" id="sync-dot"></span><span id="sync-label">Connecting…</span></div>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-title">Moving in,<br><em>together.</em></div>
+    <p class="hero-sub">Everything for the new place — what you have, what you need, and who's buying what.</p>
+  </div>
+  <div class="stats-row" id="hero-stats">
+    <div class="stat-pill"><div class="num">—</div><div class="lbl">Loading</div></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="error-banner" id="error-banner"></div>
+
+  <div class="view active" id="view-rooms">
+    <div id="rooms-loading" class="loading">Loading rooms</div>
+    <div id="rooms-content" style="display:none">
+      <div class="room-nav" id="room-nav"></div>
+      <div id="room-sections"></div>
+    </div>
+  </div>
+
+  <div class="view" id="view-shopping">
+    <div class="shopping-grid" id="shopping-grid"></div>
+  </div>
+
+  <div class="view" id="view-purchases">
+    <div class="purchases-layout">
+      <div>
+        <div class="card">
+          <div class="card-header"><h3>Purchase log</h3><span id="purchase-count"></span></div>
+          <table class="purchase-table">
+            <thead><tr><th>Item</th><th>Price</th><th>Who paid</th><th>Date</th><th></th></tr></thead>
+            <tbody id="purchase-tbody"></tbody>
+            <tfoot id="purchase-tfoot"></tfoot>
+          </table>
+          <div class="add-purchase">
+            <input type="text" id="p-item" placeholder="Item name" />
+            <input type="number" id="p-price" placeholder="$0.00" step="0.01" />
+            <select id="p-who">
+              <option value="Marc">Marc</option>
+              <option value="Shelby">Shelby</option>
+              <option value="Both">Both</option>
+            </select>
+            <button class="btn-add-purchase" onclick="addPurchase()">Add</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-header"><h3>Balance</h3></div>
+          <div class="balance-card" id="balance-card"><div class="loading">Loading</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────
+// CONFIG — replace with your Supabase project values
+// Find these in: Supabase dashboard → Settings → API
+// ─────────────────────────────────────────
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const ROOMS = ['Primary Bedroom', 'Bathroom', 'Kitchen', 'Living Room'];
+let items = [];
+let purchases = [];
+
+function setSyncState(state) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-label');
+  dot.className = 'sync-dot ' + state;
+  label.textContent = state === 'live' ? 'Live' : state === 'saving' ? 'Saving…' : 'Connecting…';
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-banner');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+async function init() {
+  try {
+    const [{ data: itemData, error: iErr }, { data: purchaseData, error: pErr }] = await Promise.all([
+      db.from('items').select('*, item_options(*)').order('id'),
+      db.from('purchases').select('*').order('created_at')
+    ]);
+    if (iErr) throw iErr;
+    if (pErr) throw pErr;
+    items = itemData;
+    purchases = purchaseData;
+    setSyncState('live');
+    renderStats();
+    renderRooms();
+    subscribeRealtime();
+    document.getElementById('rooms-loading').style.display = 'none';
+    document.getElementById('rooms-content').style.display = 'block';
+  } catch (e) {
+    showError('Could not connect to Supabase — check your URL and anon key in the source.');
+    setSyncState('');
+    console.error(e);
+  }
+}
+
+function subscribeRealtime() {
+  db.channel('move-in')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, refreshItems)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'item_options' }, refreshItems)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'purchases' }, refreshPurchases)
+    .subscribe();
+}
+
+async function refreshItems() {
+  const { data, error } = await db.from('items').select('*, item_options(*)').order('id');
+  if (error) return;
+  items = data;
+  renderStats();
+  renderRooms();
+}
+
+async function refreshPurchases() {
+  const { data, error } = await db.from('purchases').select('*').order('created_at');
+  if (error) return;
+  purchases = data;
+  renderStats();
+  if (document.getElementById('view-purchases').classList.contains('active')) renderPurchases();
+}
+
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  ['rooms','shopping','purchases'].forEach((name, i) => {
+    if (name === v) document.querySelectorAll('.nav-tab')[i].classList.add('active');
+  });
+  if (v === 'purchases') renderPurchases();
+  if (v === 'shopping') renderShopping();
+}
+
+function renderStats() {
+  const have = items.filter(i => i.status === 'Have It').length;
+  const need = items.filter(i => i.status === 'Need to Buy').length;
+  const tbd = items.filter(i => !i.status).length;
+  const spent = purchases.reduce((a, b) => a + parseFloat(b.price), 0);
+  document.getElementById('hero-stats').innerHTML = `
+    <div class="stat-pill green"><div class="num">${have}</div><div class="lbl">Have it</div></div>
+    <div class="stat-pill amber"><div class="num">${need}</div><div class="lbl">Need to buy</div></div>
+    <div class="stat-pill"><div class="num">${tbd}</div><div class="lbl">TBD</div></div>
+    <div class="stat-pill red"><div class="num">$${Math.round(spent).toLocaleString()}</div><div class="lbl">Spent</div></div>`;
+}
+
+function renderRooms() {
+  const openCards = new Set([...document.querySelectorAll('.item-card.open')].map(el => el.dataset.id));
+  const activeRoom = document.querySelector('.room-section.active')?.id?.replace('room-','').replace(/-/g,' ') || ROOMS[0];
+
+  document.getElementById('room-nav').innerHTML = ROOMS.map(r =>
+    `<button class="room-btn ${r===activeRoom?'active':''}" onclick="switchRoom('${r.replace(/'/g,"\\'")}',this)">${r}</button>`
+  ).join('');
+
+  document.getElementById('room-sections').innerHTML = ROOMS.map(room => {
+    const roomItems = items.filter(i => i.room === room);
+    const have = roomItems.filter(i => i.status === 'Have It').length;
+    const need = roomItems.filter(i => i.status === 'Need to Buy').length;
+    return `
+    <div class="room-section ${room===activeRoom?'active':''}" id="room-${room.replace(/\s+/g,'-')}">
+      <div class="room-header">
+        <h2>${room}</h2>
+        <span class="room-meta">${have} have · ${need} to buy · ${roomItems.length} total</span>
+      </div>
+      <div class="col-headers"><span>Item</span><span>Status</span><span>Assigned to</span><span>Notes</span><span></span></div>
+      <div>${roomItems.map(item => renderItemCard(item, openCards.has(String(item.id)))).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderItemCard(item, isOpen) {
+  const bc = item.status==='Have It'?'badge-have':item.status==='Need to Buy'?'badge-buy':'badge-tbd';
+  const bl = item.status==='Have It'?'Have it':item.status==='Need to Buy'?'Need to buy':'TBD';
+  const opts = (item.item_options||[]).map(o => `
+    <div class="option-row">
+      <span class="option-name">${o.name||'—'}</span>
+      <span class="option-price">${o.price||'—'}</span>
+      <span class="option-store">${o.store||'—'}</span>
+      <span class="option-link">${o.link?`<a href="${o.link}" target="_blank">View ↗</a>`:'—'}</span>
+      <button class="btn-del" onclick="deleteOption(${o.id},${item.id})">×</button>
+    </div>`).join('');
+  return `
+  <div class="item-card ${isOpen?'open':''}" id="card-${item.id}" data-id="${item.id}">
+    <div class="item-main" onclick="toggleCard(${item.id})">
+      <div class="item-name-text">${item.name}</div>
+      <div><span class="badge ${bc}" id="badge-${item.id}">${bl}</span></div>
+      <div>
+        <select class="item-select" onchange="updateStatus(${item.id},this.value)" onclick="event.stopPropagation()">
+          <option value="" ${!item.status?'selected':''}>TBD</option>
+          <option value="Have It" ${item.status==='Have It'?'selected':''}>Have it</option>
+          <option value="Need to Buy" ${item.status==='Need to Buy'?'selected':''}>Need to buy</option>
+        </select>
+      </div>
+      <div>
+        <select class="item-select" onchange="updateOwner(${item.id},this.value)" onclick="event.stopPropagation()">
+          <option value="" ${!item.owner?'selected':''}>— unassigned</option>
+          <option value="Marc" ${item.owner==='Marc'?'selected':''}>Marc</option>
+          <option value="Shelby" ${item.owner==='Shelby'?'selected':''}>Shelby</option>
+          <option value="Both" ${item.owner==='Both'?'selected':''}>Both</option>
+        </select>
+      </div>
+      <div class="chevron"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="item-expand">
+      <div class="options-header">Purchase options</div>
+      <div id="options-${item.id}">${opts||'<div class="no-options">No options added yet.</div>'}</div>
+      <div class="add-option-row">
+        <input type="text" placeholder="Option name" id="opt-name-${item.id}" />
+        <input type="text" placeholder="Price" id="opt-price-${item.id}" />
+        <input type="text" placeholder="Store" id="opt-store-${item.id}" />
+        <input type="url" placeholder="https://…" id="opt-link-${item.id}" />
+        <button class="btn-add-option" onclick="addOption(${item.id})">+ Add</button>
+      </div>
+      <textarea class="notes-area" placeholder="Notes…" onchange="updateNotes(${item.id},this.value)">${item.notes||''}</textarea>
+    </div>
+  </div>`;
+}
+
+function toggleCard(id) { document.getElementById('card-'+id).classList.toggle('open'); }
+
+function switchRoom(room, btn) {
+  document.querySelectorAll('.room-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.room-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('room-'+room.replace(/\s+/g,'-')).classList.add('active');
+}
+
+const debounceTimers = {};
+function debounce(key, fn, delay=600) { clearTimeout(debounceTimers[key]); debounceTimers[key]=setTimeout(fn,delay); }
+
+async function updateStatus(id, val) {
+  const item = items.find(i => i.id===id);
+  item.status = val;
+  const badge = document.getElementById('badge-'+id);
+  if (badge) {
+    badge.className = 'badge '+(val==='Have It'?'badge-have':val==='Need to Buy'?'badge-buy':'badge-tbd');
+    badge.textContent = val==='Have It'?'Have it':val==='Need to Buy'?'Need to buy':'TBD';
+  }
+  renderStats();
+  setSyncState('saving');
+  const { error } = await db.from('items').update({ status: val }).eq('id', id);
+  if (error) showError('Failed to save status.');
+  setSyncState('live');
+}
+
+async function updateOwner(id, val) {
+  items.find(i => i.id===id).owner = val;
+  setSyncState('saving');
+  const { error } = await db.from('items').update({ owner: val }).eq('id', id);
+  if (error) showError('Failed to save owner.');
+  setSyncState('live');
+}
+
+async function updateNotes(id, val) {
+  items.find(i => i.id===id).notes = val;
+  debounce('notes-'+id, async () => {
+    setSyncState('saving');
+    const { error } = await db.from('items').update({ notes: val }).eq('id', id);
+    if (error) showError('Failed to save notes.');
+    setSyncState('live');
+  });
+}
+
+async function addOption(itemId) {
+  const name  = document.getElementById('opt-name-'+itemId).value.trim();
+  const price = document.getElementById('opt-price-'+itemId).value.trim();
+  const store = document.getElementById('opt-store-'+itemId).value.trim();
+  const link  = document.getElementById('opt-link-'+itemId).value.trim();
+  if (!name && !store) return;
+  setSyncState('saving');
+  const { data, error } = await db.from('item_options').insert({ item_id:itemId, name, price, store, link }).select().single();
+  if (error) { showError('Failed to add option.'); setSyncState('live'); return; }
+  const item = items.find(i => i.id===itemId);
+  item.item_options = [...(item.item_options||[]), data];
+  const container = document.getElementById('options-'+itemId);
+  const hint = container.querySelector('.no-options');
+  if (hint) hint.remove();
+  const row = document.createElement('div');
+  row.className = 'option-row';
+  row.innerHTML = `
+    <span class="option-name">${data.name||'—'}</span>
+    <span class="option-price">${data.price||'—'}</span>
+    <span class="option-store">${data.store||'—'}</span>
+    <span class="option-link">${data.link?`<a href="${data.link}" target="_blank">View ↗</a>`:'—'}</span>
+    <button class="btn-del" onclick="deleteOption(${data.id},${itemId})">×</button>`;
+  container.appendChild(row);
+  ['opt-name-','opt-price-','opt-store-','opt-link-'].forEach(p => { document.getElementById(p+itemId).value=''; });
+  setSyncState('live');
+}
+
+async function deleteOption(optionId, itemId) {
+  setSyncState('saving');
+  const { error } = await db.from('item_options').delete().eq('id', optionId);
+  if (error) { showError('Failed to delete option.'); setSyncState('live'); return; }
+  const item = items.find(i => i.id===itemId);
+  item.item_options = item.item_options.filter(o => o.id!==optionId);
+  const container = document.getElementById('options-'+itemId);
+  container.querySelectorAll('.option-row').forEach(row => {
+    if (row.querySelector('.btn-del')?.getAttribute('onclick')?.includes('deleteOption('+optionId)) row.remove();
+  });
+  if (!container.querySelector('.option-row')) container.innerHTML='<div class="no-options">No options added yet.</div>';
+  setSyncState('live');
+}
+
+async function addPurchase() {
+  const item  = document.getElementById('p-item').value.trim();
+  const price = parseFloat(document.getElementById('p-price').value);
+  const who   = document.getElementById('p-who').value;
+  if (!item || isNaN(price)) return;
+  setSyncState('saving');
+  const { data, error } = await db.from('purchases').insert({ item, price, who }).select().single();
+  if (error) { showError('Failed to add purchase.'); setSyncState('live'); return; }
+  purchases.push(data);
+  document.getElementById('p-item').value = '';
+  document.getElementById('p-price').value = '';
+  renderPurchases();
+  renderStats();
+  setSyncState('live');
+}
+
+async function deletePurchase(id) {
+  setSyncState('saving');
+  const { error } = await db.from('purchases').delete().eq('id', id);
+  if (error) { showError('Failed to delete.'); setSyncState('live'); return; }
+  purchases = purchases.filter(p => p.id!==id);
+  renderPurchases();
+  renderStats();
+  setSyncState('live');
+}
+
+function renderPurchases() {
+  document.getElementById('purchase-tbody').innerHTML = purchases.map(p => `
+    <tr>
+      <td>${p.item}</td>
+      <td>$${parseFloat(p.price).toFixed(2)}</td>
+      <td class="who-${p.who.toLowerCase()}">${p.who}</td>
+      <td style="color:var(--ink-faint)">${p.purchased_date||'—'}</td>
+      <td><button class="btn-del" onclick="deletePurchase(${p.id})">×</button></td>
+    </tr>`).join('');
+
+  const total = purchases.reduce((a,b) => a+parseFloat(b.price), 0);
+  let marc=0, shelby=0;
+  purchases.forEach(p => {
+    const v = parseFloat(p.price);
+    if (p.who==='Marc') marc+=v;
+    else if (p.who==='Shelby') shelby+=v;
+    else { marc+=v/2; shelby+=v/2; }
+  });
+
+  document.getElementById('purchase-tfoot').innerHTML = `
+    <tr><td><strong>Total</strong></td><td><strong>$${total.toFixed(2)}</strong></td>
+    <td colspan="3" style="font-size:12px;color:var(--ink-light)">Marc $${marc.toFixed(2)} · Shelby $${shelby.toFixed(2)}</td></tr>`;
+  document.getElementById('purchase-count').textContent = `${purchases.length} items`;
+
+  const diff = Math.abs(marc-shelby);
+  const owes = marc < shelby ? 'Marc owes Shelby' : shelby < marc ? 'Shelby owes Marc' : "All even!";
+  const pct = total > 0 ? (marc/total*100) : 50;
+  document.getElementById('balance-card').innerHTML = `
+    <div class="balance-person person-marc">
+      <span class="person-name">Marc</span>
+      <span class="person-amount">$${marc.toFixed(2)}</span>
+    </div>
+    <div class="balance-person person-shelby">
+      <span class="person-name">Shelby</span>
+      <span class="person-amount">$${shelby.toFixed(2)}</span>
+    </div>
+    <div class="balance-bar"><div class="balance-fill" style="width:${Math.min(100,Math.max(0,pct)).toFixed(1)}%"></div></div>
+    <div class="balance-owed">
+      ${diff>0.005?`<strong>$${diff.toFixed(2)}</strong>${owes}`:`<strong>All even!</strong>`}
+    </div>`;
+}
+
+function renderShopping() {
+  const needItems = items.filter(i => i.status==='Need to Buy'||!i.status);
+  const withOpts = needItems.filter(i => (i.item_options||[]).length>0);
+  const noOpts   = needItems.filter(i => !(i.item_options||[]).length);
+  const card = item => `
+    <div class="shop-card">
+      <div class="shop-item-name">${item.name}</div>
+      <div class="shop-room">${item.room}</div>
+      ${(item.item_options||[]).length
+        ? (item.item_options||[]).map(o=>`
+          <div class="shop-option">
+            <div><div class="shop-option-name">${o.name||o.store||'Option'}</div><div class="shop-option-store">${o.store||''}</div></div>
+            <div style="text-align:right">
+              <div class="shop-option-price">${o.price||'—'}</div>
+              ${o.link?`<div class="shop-option-link"><a href="${o.link}" target="_blank">View ↗</a></div>`:''}
+            </div>
+          </div>`).join('')
+        : '<div class="no-shop-options">No options yet</div>'}
+    </div>`;
+  document.getElementById('shopping-grid').innerHTML =
+    (withOpts.length?`<div class="shop-section-title">With options (${withOpts.length})</div>`+withOpts.map(card).join(''):'') +
+    (noOpts.length?`<div class="shop-section-title">Still need options (${noOpts.length})</div>`+noOpts.map(card).join(''):'');
+}
+
+init();
+</script>
+</body>
+</html>
