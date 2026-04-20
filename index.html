@@ -240,8 +240,8 @@
 // CONFIG — replace with your Supabase project values
 // Find these in: Supabase dashboard → Settings → API
 // ─────────────────────────────────────────
-const SUPABASE_URL = 'https://pchknwcyuxgsrslymdyq.supabase.co/rest/v1/';
-const SUPABASE_ANON_KEY = 'sb_publishable_-9WaIZ0Po8UU31tNdhFCyw_dMG621io';
+const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -257,14 +257,27 @@ function setSyncState(state) {
   label.textContent = state === 'live' ? 'Live' : state === 'saving' ? 'Saving…' : 'Connecting…';
 }
 
-function showError(msg) {
+function showError(msg, persistent = false) {
   const el = document.getElementById('error-banner');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 5000);
+  if (!persistent) setTimeout(() => el.classList.remove('show'), 5000);
 }
 
+
+
+
+
+
+
 async function init() {
+  if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+    document.getElementById('rooms-loading').style.display = 'none';
+    document.getElementById('rooms-content').style.display = 'block';
+    showError('Add your Supabase URL and key to the top of index.html to get started.', true);
+    setSyncState('');
+    return;
+  }
   try {
     const [{ data: itemData, error: iErr }, { data: purchaseData, error: pErr }] = await Promise.all([
       db.from('items').select('*, item_options(*)').order('id'),
@@ -281,7 +294,7 @@ async function init() {
     document.getElementById('rooms-loading').style.display = 'none';
     document.getElementById('rooms-content').style.display = 'block';
   } catch (e) {
-    showError('Could not connect to Supabase — check your URL and anon key in the source.');
+    showError('Could not connect to Supabase — check your URL and key in the source.', true);
     setSyncState('');
     console.error(e);
   }
