@@ -219,3 +219,17 @@ async function deleteOption(optionId, itemId) {
   }
   setSyncState('live');
 }
+
+async function deleteItem(id, name) {
+  if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  setSyncState('saving');
+  try {
+    await dbDeleteItem(id);
+    items = items.filter(i => i.id !== id);
+    renderStats();
+    renderRooms();
+  } catch {
+    showError('Failed to delete item.');
+  }
+  setSyncState('live');
+}
