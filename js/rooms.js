@@ -37,7 +37,7 @@ function renderRooms() {
           <option value="Need to Buy">Need to buy</option>
         </select>
         <select id="new-item-owner-${roomId}">
-          <option value="">— unassigned</option>
+          <option value="">&mdash; unassigned</option>
           <option value="Marc">Marc</option>
           <option value="Shelby">Shelby</option>
           <option value="Both">Both</option>
@@ -54,10 +54,10 @@ function renderItemCard(item, isOpen) {
   const bl   = item.status === 'Have It' ? 'Have it'   : item.status === 'Need to Buy' ? 'Need to buy' : 'TBD';
   const opts = (item.item_options || []).map(o => `
     <div class="option-row">
-      <span class="option-name">${o.name  || '—'}</span>
-      <span class="option-price">${o.price || '—'}</span>
-      <span class="option-store">${o.store || '—'}</span>
-      <span class="option-link">${o.link ? `<a href="${o.link}" target="_blank">View ↗</a>` : '—'}</span>
+      <span class="option-name">${o.name  || '&mdash;'}</span>
+      <span class="option-price">${o.price || '&mdash;'}</span>
+      <span class="option-store">${o.store || '&mdash;'}</span>
+      <span class="option-link">${o.link ? `<a href="${o.link}" target="_blank">View ↗</a>` : '&mdash;'}</span>
       <button class="btn-del" onclick="deleteOption(${o.id}, ${item.id})">×</button>
     </div>`).join('');
 
@@ -75,7 +75,7 @@ function renderItemCard(item, isOpen) {
       </div>
       <div>
         <select class="item-select" onchange="updateOwner(${item.id}, this.value)" onclick="event.stopPropagation()">
-          <option value=""       ${!item.owner              ? 'selected' : ''}>— unassigned</option>
+          <option value=""       ${!item.owner              ? 'selected' : ''}>&mdash; unassigned</option>
           <option value="Marc"   ${item.owner === 'Marc'    ? 'selected' : ''}>Marc</option>
           <option value="Shelby" ${item.owner === 'Shelby'  ? 'selected' : ''}>Shelby</option>
           <option value="Both"   ${item.owner === 'Both'    ? 'selected' : ''}>Both</option>
