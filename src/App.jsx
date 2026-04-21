@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard'
 import Rooms from './pages/Rooms'
 import Shopping from './pages/Shopping'
 import Purchases from './pages/Purchases'
+import SportsDashboard from './pages/SportsDashboard'
 
 export default function App() {
   const [view, setView] = useState('dashboard')
@@ -17,6 +18,7 @@ export default function App() {
     rooms:     <Rooms />,
     shopping:  <Shopping />,
     purchases: <Purchases />,
+    sports:    <SportsDashboard />,
   }
 
   return (

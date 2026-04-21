@@ -4,10 +4,11 @@ export default function Nav({ view, setView }) {
   const { syncState } = useHub()
 
   const tabs = [
-    { id: 'dashboard', label: 'Home' },
-    { id: 'rooms',     label: 'Rooms' },
-    { id: 'shopping',  label: 'Shopping list' },
-    { id: 'purchases', label: 'Purchases' },
+  { id: 'dashboard', label: 'Home' },
+  { id: 'rooms',     label: 'Rooms' },
+  { id: 'shopping',  label: 'Shopping list' },
+  { id: 'purchases', label: 'Purchases' },
+  { id: 'sports',    label: 'Sports' },
   ]
 
   return (
