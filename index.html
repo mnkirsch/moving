@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Marc & Shelby — House Hub</title>
+  <title>Marc &amp; Shelby &mdash; House Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/main.css" />
@@ -11,7 +11,7 @@
 <body>
 
   <nav>
-    <div class="nav-logo">Marc <span>&</span> Shelby</div>
+    <div class="nav-logo">Marc <span>&amp;</span> Shelby</div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="showView('dashboard')">Home</button>
       <button class="nav-tab"        onclick="showView('rooms')">Rooms</button>
@@ -20,25 +20,67 @@
     </div>
     <div class="nav-right">
       <span class="sync-dot" id="sync-dot"></span>
-      <span id="sync-label">Connecting…</span>
+      <span id="sync-label">Connecting...</span>
     </div>
   </nav>
 
   <div class="hero">
     <div>
       <div class="hero-title">Moving in,<br><em>together.</em></div>
-      <p class="hero-sub">Everything for the new place — what you have, what you need, and who's buying what.</p>
+      <p class="hero-sub">Everything for the new place &mdash; what you have, what you need, and who's buying what.</p>
     </div>
     <div class="stats-row" id="hero-stats">
-      <div class="stat-pill"><div class="num">—</div><div class="lbl">Loading</div></div>
+      <div class="stat-pill"><div class="num">-</div><div class="lbl">Loading</div></div>
     </div>
+  </div>
+
+  <!-- Dashboard -- outside container, full bleed dark bg -->
+  <div class="view active" id="view-dashboard">
+
+    <!-- Clock -->
+    <div class="dash-widget dash-clock">
+      <div>
+        <div id="dash-time">--:--</div>
+        <div id="dash-date">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Weather -->
+    <div class="dash-widget dash-weather" id="weather-widget">
+      <div class="dash-stats-title">Austin, TX</div>
+      <div class="weather-current" id="weather-current">
+        <div class="weather-icon">&#x23F3;</div>
+        <div class="weather-temp">--&deg;</div>
+        <div class="weather-meta"><span class="weather-label">Loading...</span></div>
+      </div>
+      <div class="weather-forecast" id="weather-forecast"></div>
+    </div>
+
+    <!-- Move-in stats -->
+    <div class="dash-widget dash-stats-widget">
+      <div class="dash-stats-title">Move-in tracker</div>
+      <div id="dash-stats">
+        <div class="dash-stat"><div class="dash-stat-num">-</div><div class="dash-stat-lbl">Loading</div></div>
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="dash-widget">
+      <div class="dash-links-title">Quick links</div>
+      <div class="dash-links">
+        <button class="dash-link-btn" onclick="showView('rooms')">Rooms <span>&#8594;</span></button>
+        <button class="dash-link-btn" onclick="showView('shopping')">Shopping list <span>&#8594;</span></button>
+        <button class="dash-link-btn" onclick="showView('purchases')">Purchases <span>&#8594;</span></button>
+      </div>
+    </div>
+
   </div>
 
   <div class="container">
     <div class="error-banner" id="error-banner"></div>
 
     <!-- Rooms -->
-    <div class="view active" id="view-rooms">
+    <div class="view" id="view-rooms">
       <div id="rooms-loading" class="loading">Loading rooms</div>
       <div id="rooms-content" style="display:none">
         <div class="room-nav" id="room-nav"></div>
@@ -65,7 +107,7 @@
                 <tr><th>Item</th><th>Price</th><th>Who paid</th><th>Date</th><th></th></tr>
               </thead>
               <tbody id="purchase-tbody"></tbody>
-              <tfoot  id="purchase-tfoot"></tfoot>
+              <tfoot id="purchase-tfoot"></tfoot>
             </table>
             <div class="add-purchase">
               <input  type="text"   id="p-item"  placeholder="Item name" />
