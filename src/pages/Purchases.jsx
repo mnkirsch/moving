@@ -7,30 +7,47 @@ export default function Purchases() {
   const [form, setForm] = useState({ item: '', price: '', who: 'Marc' })
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  const total  = purchases.reduce((a, b) => a + parseFloat(b.price), 0)
+  // Only unsettled purchases count toward the balance
+  const active = purchases.filter(p => !p.settlement)
+  const total  = active.reduce((a, b) => a + parseFloat(b.price), 0)
   let marc = 0, shelby = 0
-  purchases.forEach(p => {
+  active.forEach(p => {
     const v = parseFloat(p.price)
     if      (p.who === 'Marc')   marc   += v
     else if (p.who === 'Shelby') shelby += v
     else                         { marc += v / 2; shelby += v / 2 }
   })
+
   const diff = Math.abs(marc - shelby)
   const owes = marc < shelby
-    ? `Marc owes Shelby`
+    ? 'Marc owes Shelby'
     : shelby < marc
-    ? `Shelby owes Marc`
+    ? 'Shelby owes Marc'
     : 'All even!'
 
   async function addPurchase() {
     const price = parseFloat(form.price)
     if (!form.item.trim() || isNaN(price)) return
     setSyncState('saving')
-    const { data, error } = await supabase.from('purchases').insert({ item: form.item.trim(), price, who: form.who }).select().single()
+    const { data, error } = await supabase
+      .from('purchases')
+      .insert({ item: form.item.trim(), price, who: form.who, settlement: false })
+      .select()
+      .single()
     if (!error) {
       setPurchases(prev => [...prev, data])
       setForm({ item: '', price: '', who: 'Marc' })
     }
+    setSyncState('live')
+  }
+
+  async function toggleSettled(id, current) {
+    setSyncState('saving')
+    const { error } = await supabase
+      .from('purchases')
+      .update({ settlement: !current })
+      .eq('id', id)
+    if (!error) setPurchases(prev => prev.map(p => p.id === id ? { ...p, settlement: !current } : p))
     setSyncState('live')
   }
 
@@ -54,15 +71,23 @@ export default function Purchases() {
             </div>
             <table className="purchase-table">
               <thead>
-                <tr><th>Item</th><th>Price</th><th>Who paid</th><th>Date</th><th></th></tr>
+                <tr><th>Item</th><th>Price</th><th>Who paid</th><th>Date</th><th>Settled</th><th></th></tr>
               </thead>
               <tbody>
                 {purchases.map(p => (
-                  <tr key={p.id}>
+                  <tr key={p.id} className={p.settlement ? 'settlement-row' : ''}>
                     <td>{p.item}</td>
                     <td>${parseFloat(p.price).toFixed(2)}</td>
                     <td className={`who-${p.who.toLowerCase()}`}>{p.who}</td>
                     <td className="date-col">{p.purchased_date || '—'}</td>
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={!!p.settlement}
+                        onChange={() => toggleSettled(p.id, p.settlement)}
+                        title="Mark as settled"
+                      />
+                    </td>
                     <td><button className="btn-del" onClick={() => deletePurchase(p.id)}>×</button></td>
                   </tr>
                 ))}
@@ -71,7 +96,7 @@ export default function Purchases() {
                 <tr>
                   <td><strong>Total</strong></td>
                   <td><strong>${total.toFixed(2)}</strong></td>
-                  <td colSpan="3" className="totals-meta">Marc ${marc.toFixed(2)} &middot; Shelby ${shelby.toFixed(2)}</td>
+                  <td colSpan="4" className="totals-meta">Marc ${marc.toFixed(2)} &middot; Shelby ${shelby.toFixed(2)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -103,7 +128,7 @@ export default function Purchases() {
                 <div className="balance-fill" style={{ width: `${Math.min(100, Math.max(0, pct)).toFixed(1)}%` }} />
               </div>
               <div className="balance-owed">
-                {diff > 0.005 ? <><strong>${diff.toFixed(2)}</strong>{owes}</> : <strong>All even!</strong>}
+                {diff > 0.005 ? <><strong>${diff.toFixed(2)}</strong> {owes}</> : <strong>All even!</strong>}
               </div>
             </div>
           </div>
