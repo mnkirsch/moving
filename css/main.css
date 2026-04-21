@@ -369,3 +369,8 @@ tfoot td {
   .add-purchase > :nth-child(3) { display: none; }
   .add-option-row { grid-template-columns: 1fr 1fr; }
 }
+
+.item-delete-row { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; }
+.btn-delete-item { font-size: 12px; font-weight: 500; padding: 6px 12px; background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--ink-faint); cursor: pointer; transition: all 0.15s; }
+.btn-delete-item:hover { background: var(--red-light); border-color: var(--red); color: var(--red); }
+
