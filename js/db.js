@@ -95,3 +95,9 @@ async function dbDeletePurchase(id) {
   const { error } = await db.from('purchases').delete().eq('id', id);
   if (error) throw error;
 }
+
+async function dbDeleteItem(id) {
+  const { error } = await db.from('items').delete().eq('id', id);
+  if (error) throw error;
+}
+
