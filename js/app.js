@@ -24,6 +24,11 @@ async function init() {
     setSyncState('');
     console.error(e);
   }
+  // Start dashboard last so Supabase data is ready for dash stats
+  initDashboard();
+  renderDashStats();
+  // Dashboard is default view — apply dark mode immediately
+  document.body.classList.add('dash-mode');
 }
 
 // ── View switching ──
@@ -31,12 +36,15 @@ function showView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
-  const names = ['rooms', 'shopping', 'purchases'];
+  const names = ['dashboard', 'rooms', 'shopping', 'purchases'];
   document.querySelectorAll('.nav-tab').forEach((t, i) => {
     if (names[i] === v) t.classList.add('active');
   });
+  // Dark mode body class for dashboard
+  document.body.classList.toggle('dash-mode', v === 'dashboard');
   if (v === 'purchases') renderPurchases();
   if (v === 'shopping')  renderShopping();
+  if (v === 'dashboard') renderDashStats();
 }
 
 // ── Stats ──
