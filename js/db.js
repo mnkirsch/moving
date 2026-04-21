@@ -100,4 +100,3 @@ async function dbDeleteItem(id) {
   const { error } = await db.from('items').delete().eq('id', id);
   if (error) throw error;
 }
-

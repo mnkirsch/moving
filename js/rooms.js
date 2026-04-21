@@ -97,14 +97,15 @@ function renderItemCard(item, isOpen) {
         <input type="url"  placeholder="https://…"    id="opt-link-${item.id}" />
         <button class="btn-add-option" onclick="addOption(${item.id})">+ Add</button>
       </div>
-      <textarea class="notes-area" ...></textarea>
+      <textarea class="notes-area" placeholder="Notes…"
+        onchange="updateNotes(${item.id}, this.value)">${item.notes || ''}</textarea>
       <div class="item-delete-row">
         <button class="btn-delete-item" onclick="deleteItem(${item.id}, '${item.name.replace(/'/g, "\\'")}')">
           Delete item
         </button>
       </div>
     </div>
-  </div>
+  </div>`;
 }
 
 function toggleCard(id) {
