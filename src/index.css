@@ -667,3 +667,100 @@ body.dash-mode .hero { display: none; }
 .sport-game-status.live { color: var(--green); font-weight: 500; }
 .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse 1s infinite; flex-shrink: 0; }
 
+/* ── Sports carousel ── */
+.sports-carousel {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+}
+.carousel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.carousel-label {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+}
+.carousel-status {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.carousel-status.live { color: var(--green); font-weight: 500; }
+.carousel-loading,
+.carousel-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: rgba(255,255,255,0.2);
+  font-style: italic;
+}
+.carousel-game {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+.carousel-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.5);
+  font-size: 14px;
+}
+.carousel-team.winner { color: #F7F4EE; font-weight: 500; }
+.carousel-logo { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+.carousel-team-name { flex: 1; }
+.carousel-score { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #F7F4EE; }
+.carousel-vs {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.15);
+  padding-left: 32px;
+}
+.carousel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.carousel-nav {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.25);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.15s;
+}
+.carousel-nav:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+.carousel-dots { display: flex; gap: 5px; align-items: center; }
+.carousel-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.2s;
+}
+.carousel-dot.active { background: var(--accent); width: 14px; border-radius: 3px; }
+
+
+#view-dashboard .sports-widget-full {
+  grid-column: 1 / -1;
+}

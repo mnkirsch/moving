@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useHub } from '../context/HubContext'
+import SportsCarousel from '../components/SportsCarousel'
 
 const WEATHER_URL =
   'https://api.open-meteo.com/v1/forecast' +
@@ -98,11 +99,11 @@ function Weather() {
   )
 }
 
-function Stats({ setView }) {
+function Stats() {
   const { items, purchases } = useHub()
-  const need   = items.filter(i => i.status === 'Need to Buy').length
-  const tbd    = items.filter(i => !i.status).length
-  const spent  = purchases.reduce((a, b) => a + parseFloat(b.price), 0)
+  const need  = items.filter(i => i.status === 'Need to Buy').length
+  const tbd   = items.filter(i => !i.status).length
+  const spent = purchases.reduce((a, b) => a + parseFloat(b.price), 0)
   let marc = 0, shelby = 0
   purchases.forEach(p => {
     const v = parseFloat(p.price)
@@ -147,6 +148,7 @@ function QuickLinks({ setView }) {
     { id: 'rooms',     label: 'Rooms' },
     { id: 'shopping',  label: 'Shopping list' },
     { id: 'purchases', label: 'Purchases' },
+    { id: 'sports',    label: 'Sports' },
   ]
   return (
     <div className="dash-widget">
@@ -169,6 +171,9 @@ export default function Dashboard({ setView }) {
       <Weather />
       <Stats />
       <QuickLinks setView={setView} />
+      <div className="dash-widget">
+        <SportsCarousel />
+      </div>
     </div>
   )
 }
