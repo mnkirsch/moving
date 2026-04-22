@@ -1,16 +1,16 @@
 import { useHub } from '../context/HubContext'
 
-export default function Nav({ view, setView }) {
+export default function Nav({ view, setView, editMode, setEditMode }) {
   const { syncState } = useHub()
 
   const tabs = [
-  { id: 'dashboard', label: 'Home' },
-  { id: 'home',      label: 'Controls' },
-  { id: 'rooms',     label: 'Rooms' },
-  { id: 'shopping',  label: 'Shopping list' },
-  { id: 'purchases', label: 'Purchases' },
-  { id: 'sports',    label: 'Sports' },
-  { id: 'settings', label: 'Settings' },
+    { id: 'dashboard', label: 'Home' },
+    { id: 'home',      label: 'Controls' },
+    { id: 'rooms',     label: 'Rooms' },
+    { id: 'shopping',  label: 'Shopping list' },
+    { id: 'purchases', label: 'Purchases' },
+    { id: 'sports',    label: 'Sports' },
+    { id: 'settings',  label: 'Settings' },
   ]
 
   return (
@@ -27,7 +27,15 @@ export default function Nav({ view, setView }) {
           </button>
         ))}
       </div>
-      <div className="nav-right">
+      <div className="nav-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {view === 'dashboard' && (
+          <button
+            className={`dash-edit-btn ${editMode ? 'active' : ''}`}
+            onClick={() => setEditMode(e => !e)}
+          >
+            {editMode ? '🔒 Lock' : '✏️ Edit'}
+          </button>
+        )}
         <span className={`sync-dot ${syncState}`} />
         <span>
           {syncState === 'live' ? 'Live' : syncState === 'error' ? 'Connection error' : 'Connecting...'}

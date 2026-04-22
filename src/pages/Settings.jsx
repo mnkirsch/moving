@@ -15,6 +15,7 @@ const WIDGET_LABELS = {
   movein:  'Move-in tracker',
   home:    'Home controls',
   links:   'Quick links',
+  calendar: 'Calendar',
 }
 
 // ── Section wrapper ──

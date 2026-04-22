@@ -1,8 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useHub } from '../context/HubContext'
-import { getSetting, subscribeSettings } from '../lib/settings'
+import { getSetting, updateSetting, subscribeSettings } from '../lib/settings'
 import SportsCarousel from '../components/SportsCarousel'
 import { getClimate, getScenes, triggerScene, isReady } from '../lib/ha'
+import GridLayout from 'react-grid-layout'
+import 'react-grid-layout/css/styles.css'
+import 'react-resizable/css/styles.css'
+import CalendarWidget from '../components/CalendarWidget'
+
+const DEFAULT_LAYOUT = [
+  { i: 'clock',   x: 0, y: 0,  w: 12, h: 2 },
+  { i: 'weather', x: 0, y: 4,  w: 6,  h: 4 },
+  { i: 'home',    x: 6, y: 4,  w: 6,  h: 4 },
+  { i: 'movein',  x: 0, y: 10, w: 6,  h: 4 },
+  { i: 'links',   x: 6, y: 10, w: 6,  h: 4 },
+  { i: 'sports',  x: 0, y: 16, w: 12, h: 4 },
+  { i: 'calendar', x: 0, y: 22, w: 6, h: 6 },
+]
 
 const WEATHER_URL =
   'https://api.open-meteo.com/v1/forecast' +
@@ -54,17 +68,15 @@ function Weather() {
         const res  = await fetch(WEATHER_URL)
         const data = await res.json()
         setWeather(data)
-      } catch {
-        setError(true)
-      }
+      } catch { setError(true) }
     }
     fetch_()
     const t = setInterval(fetch_, 10 * 60 * 1000)
     return () => clearInterval(t)
   }, [])
 
-  if (error) return <div className="dash-widget dash-weather"><p className="widget-error">Weather unavailable</p></div>
-  if (!weather) return <div className="dash-widget dash-weather"><p className="widget-error">Loading...</p></div>
+  if (error)    return <div className="dash-widget"><p className="widget-error">Weather unavailable</p></div>
+  if (!weather) return <div className="dash-widget"><p className="widget-error">Loading...</p></div>
 
   const c   = weather.current
   const d   = weather.daily
@@ -151,7 +163,7 @@ function QuickLinks({ setView }) {
     { id: 'shopping',  label: 'Shopping list' },
     { id: 'purchases', label: 'Purchases' },
     { id: 'sports',    label: 'Sports' },
-    { id: 'home', label: 'Home controls' },
+    { id: 'home',      label: 'Controls' },
   ]
   return (
     <div className="dash-widget">
@@ -218,7 +230,24 @@ function HomeWidget({ setView }) {
   )
 }
 
-export default function Dashboard({ setView }) {
+// ── Widget wrapper — handles edit mode visuals ──
+function WidgetCell({ editMode, children }) {
+  return (
+    <div className={`dash-cell ${editMode ? 'edit' : ''}`}>
+      {editMode && (
+        <div className="drag-handle">
+          <span className="drag-dots">&#8942;&#8942;</span>
+        </div>
+      )}
+      <div className="dash-cell-content">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+export default function Dashboard({ setView, editMode }) {
+  const [layout, setLayout]   = useState(DEFAULT_LAYOUT)
   const [widgets, setWidgets] = useState({
     clock:   { visible: true },
     weather: { visible: true },
@@ -226,34 +255,79 @@ export default function Dashboard({ setView }) {
     movein:  { visible: true },
     home:    { visible: true },
     links:   { visible: true },
+    calendar: { visible: true },
   })
+  const containerRef          = useRef(null)
+  const [gridWidth, setGridWidth] = useState(window.innerWidth)
 
   useEffect(() => {
-    getSetting('dashboard').then(v => {
-      if (v?.widgets) setWidgets(v.widgets)
-    })
-
-    const channel = subscribeSettings('dashboard', v => {
-      if (v?.widgets) setWidgets(v.widgets)
-    })
-
-    return () => channel.unsubscribe()
+    getSetting('dashboard_layout').then(v => { if (v?.layout) setLayout(v.layout) })
+    getSetting('dashboard').then(v => { if (v?.widgets) setWidgets(v.widgets) })
+    const ch1 = subscribeSettings('dashboard_layout', v => { if (v?.layout) setLayout(v.layout) })
+    const ch2 = subscribeSettings('dashboard', v => { if (v?.widgets) setWidgets(v.widgets) })
+    return () => { ch1.unsubscribe(); ch2.unsubscribe() }
   }, [])
+
+  useEffect(() => {
+    if (!containerRef.current) return
+    const observer = new ResizeObserver(entries => {
+      setGridWidth(entries[0].contentRect.width)
+    })
+    observer.observe(containerRef.current)
+    return () => observer.disconnect()
+  }, [])
+
+  async function onLayoutChange(newLayout) {
+    if (!editMode) return
+    setLayout(newLayout)
+    await updateSetting('dashboard_layout', { layout: newLayout })
+  }
 
   const show = key => widgets[key]?.visible !== false
 
+  const WIDGETS = {
+    clock:   <Clock />,
+    weather: <Weather />,
+    home:    <HomeWidget setView={setView} />,
+    movein:  <Stats />,
+    links:   <QuickLinks setView={setView} />,
+    sports:  <div className="dash-widget"><SportsCarousel /></div>,
+    calendar: <CalendarWidget />,
+  }
+
+  const visibleLayout = layout
+    .filter(l => show(l.i))
+    .map(l => ({ ...l, static: !editMode }))
+
   return (
     <div id="view-dashboard" className="view active">
-      {show('clock')   && <Clock />}
-      {show('weather') && <Weather />}
-      {show('home')    && <HomeWidget setView={setView} />}
-      {show('movein')  && <Stats />}
-      {show('links')   && <QuickLinks setView={setView} />}
-      {show('sports')  && (
-        <div className="dash-widget">
-          <SportsCarousel />
+      {editMode && (
+        <div className="dash-edit-banner">
+          Drag and resize widgets — click Lock when done
         </div>
       )}
+      <div ref={containerRef}>
+        <GridLayout
+          layout={visibleLayout}
+          cols={12}
+          rowHeight={40}
+          width={gridWidth}
+          onLayoutChange={onLayoutChange}
+          isDraggable={editMode}
+          isResizable={editMode}
+          draggableHandle=".drag-handle"
+          margin={[12, 12]}
+          compactType="vertical"
+        >
+          {visibleLayout.map(l => (
+            <div key={l.i}>
+              <WidgetCell editMode={editMode}>
+                {WIDGETS[l.i]}
+              </WidgetCell>
+            </div>
+          ))}
+        </GridLayout>
+      </div>
     </div>
   )
 }

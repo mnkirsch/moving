@@ -8,28 +8,28 @@ import SportsDashboard from './pages/SportsDashboard'
 import HomeAssistant from './pages/HomeAssistant'
 import Settings from './pages/Settings'
 
-
-
 export default function App() {
-  const [view, setView] = useState('dashboard')
+  const [view, setView]         = useState('dashboard')
+  const [editMode, setEditMode] = useState(false)
 
   useEffect(() => {
     document.body.classList.toggle('dash-mode', view === 'dashboard')
+    if (view !== 'dashboard') setEditMode(false)
   }, [view])
 
   const pages = {
-    dashboard: <Dashboard setView={setView} />,
-    home: <HomeAssistant />,
+    dashboard: <Dashboard setView={setView} editMode={editMode} setEditMode={setEditMode} />,
     rooms:     <Rooms />,
     shopping:  <Shopping />,
     purchases: <Purchases />,
     sports:    <SportsDashboard />,
-    settings: <Settings />,
+    home:      <HomeAssistant />,
+    settings:  <Settings />,
   }
 
   return (
     <>
-      <Nav view={view} setView={setView} />
+      <Nav view={view} setView={setView} editMode={editMode} setEditMode={setEditMode} />
       {pages[view]}
     </>
   )
