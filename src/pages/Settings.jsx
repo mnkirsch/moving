@@ -98,6 +98,7 @@ function GeneralSettings() {
 function DashboardSettings() {
   const [widgets, setWidgets] = useState({})
   const [saved,   setSaved]   = useState(false)
+  const [reset,   setReset]   = useState(false)
 
   useEffect(() => {
     getSetting('dashboard').then(v => { if (v?.widgets) setWidgets(v.widgets) })
@@ -109,6 +110,23 @@ function DashboardSettings() {
     await updateSetting('dashboard', { widgets: next })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  async function resetLayout() {
+    const defaultLayout = {
+      layout: [
+        { i: 'clock',    x: 0, y: 0,  w: 12, h: 4 },
+        { i: 'weather',  x: 0, y: 4,  w: 6,  h: 6 },
+        { i: 'home',     x: 6, y: 4,  w: 6,  h: 6 },
+        { i: 'movein',   x: 0, y: 10, w: 6,  h: 6 },
+        { i: 'links',    x: 6, y: 10, w: 6,  h: 6 },
+        { i: 'sports',   x: 0, y: 16, w: 12, h: 6 },
+        { i: 'calendar', x: 0, y: 22, w: 6,  h: 6 },
+      ]
+    }
+    await updateSetting('dashboard_layout', defaultLayout)
+    setReset(true)
+    setTimeout(() => setReset(false), 2000)
   }
 
   return (
@@ -125,6 +143,11 @@ function DashboardSettings() {
         </div>
       ))}
       {saved && <div className="settings-saved-inline">Saved!</div>}
+      <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+        <button className={`settings-save ${reset ? 'saved' : ''}`} onClick={resetLayout} style={{ background: 'transparent', color: 'var(--ink-light)', border: '1px solid var(--border)' }}>
+          {reset ? 'Reset!' : 'Reset dashboard layout'}
+        </button>
+      </div>
     </Section>
   )
 }
