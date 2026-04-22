@@ -5,11 +5,12 @@ export default function Nav({ view, setView }) {
 
   const tabs = [
   { id: 'dashboard', label: 'Home' },
-  { id: 'home', label: 'Home' },
+  { id: 'home',      label: 'Controls' },
   { id: 'rooms',     label: 'Rooms' },
   { id: 'shopping',  label: 'Shopping list' },
   { id: 'purchases', label: 'Purchases' },
   { id: 'sports',    label: 'Sports' },
+  { id: 'settings', label: 'Settings' },
   ]
 
   return (

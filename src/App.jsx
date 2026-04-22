@@ -6,6 +6,8 @@ import Shopping from './pages/Shopping'
 import Purchases from './pages/Purchases'
 import SportsDashboard from './pages/SportsDashboard'
 import HomeAssistant from './pages/HomeAssistant'
+import Settings from './pages/Settings'
+
 
 
 export default function App() {
@@ -22,6 +24,7 @@ export default function App() {
     shopping:  <Shopping />,
     purchases: <Purchases />,
     sports:    <SportsDashboard />,
+    settings: <Settings />,
   }
 
   return (

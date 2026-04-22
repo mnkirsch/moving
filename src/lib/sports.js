@@ -1,3 +1,5 @@
+import { getSetting } from './settings'
+
 const ESPN = 'https://site.api.espn.com/apis/site/v2/sports'
 
 export const LEAGUES = {
@@ -69,7 +71,7 @@ function filterToMyTeams(events, teams) {
 }
 
 function getNextGamePerTeam(events, teams) {
-  const cutoff  = new Date()
+  const cutoff   = new Date()
   cutoff.setHours(0, 0, 0, 0)
   const upcoming = events.filter(e => new Date(e.date) >= cutoff)
   const seen     = new Set()
@@ -94,9 +96,20 @@ function getNextGamePerTeam(events, teams) {
 }
 
 export async function fetchLeague(key) {
-  const league = LEAGUES[key]
+  const base = LEAGUES[key]
+
+  // Try to load teams from settings, fall back to hardcoded defaults
+  let teams = base.teams
   try {
-    // Fetch today
+    const sportSettings = await getSetting('sports')
+    if (sportSettings?.teams?.[key] && sportSettings.teams[key].length > 0) {
+      teams = sportSettings.teams[key]
+    }
+  } catch { /* use defaults */ }
+
+  const league = { ...base, teams }
+
+  try {
     const todayEvents  = await fetchEvents(league.url)
     const myGamesToday = filterToMyTeams(todayEvents, league.teams)
 
@@ -104,13 +117,11 @@ export async function fetchLeague(key) {
       return { games: myGamesToday.map(parseEvent), status: 'today' }
     }
 
-    // No games today — look ahead
     const lookahead    = league.soccer ? 45 : 14
     const futureEvents = await fetchEvents(league.url, futureDateRange(lookahead))
     const myFuture     = filterToMyTeams(futureEvents, league.teams)
 
     if (myFuture.length > 0) {
-      // Get next game per team so all teams show up
       const nextGames = league.teams
         ? getNextGamePerTeam(myFuture, league.teams)
         : myFuture.filter(e => new Date(e.date) >= new Date()).slice(0, 3)

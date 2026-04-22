@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useHub } from '../context/HubContext'
+import { getSetting, subscribeSettings } from '../lib/settings'
 import SportsCarousel from '../components/SportsCarousel'
 import { getClimate, getScenes, triggerScene, isReady } from '../lib/ha'
 
@@ -218,16 +219,41 @@ function HomeWidget({ setView }) {
 }
 
 export default function Dashboard({ setView }) {
+  const [widgets, setWidgets] = useState({
+    clock:   { visible: true },
+    weather: { visible: true },
+    sports:  { visible: true },
+    movein:  { visible: true },
+    home:    { visible: true },
+    links:   { visible: true },
+  })
+
+  useEffect(() => {
+    getSetting('dashboard').then(v => {
+      if (v?.widgets) setWidgets(v.widgets)
+    })
+
+    const channel = subscribeSettings('dashboard', v => {
+      if (v?.widgets) setWidgets(v.widgets)
+    })
+
+    return () => channel.unsubscribe()
+  }, [])
+
+  const show = key => widgets[key]?.visible !== false
+
   return (
     <div id="view-dashboard" className="view active">
-      <Clock />
-      <Weather />
-      <Stats />
-      <QuickLinks setView={setView} />
-      <div className="dash-widget">
-        <SportsCarousel />
-      </div>
-      <HomeWidget setView={setView} />
+      {show('clock')   && <Clock />}
+      {show('weather') && <Weather />}
+      {show('home')    && <HomeWidget setView={setView} />}
+      {show('movein')  && <Stats />}
+      {show('links')   && <QuickLinks setView={setView} />}
+      {show('sports')  && (
+        <div className="dash-widget">
+          <SportsCarousel />
+        </div>
+      )}
     </div>
   )
 }
