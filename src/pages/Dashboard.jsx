@@ -18,13 +18,6 @@ const DEFAULT_LAYOUT = [
   { i: 'calendar', x: 0, y: 22, w: 6, h: 6 },
 ]
 
-const WEATHER_URL =
-  'https://api.open-meteo.com/v1/forecast' +
-  '?latitude=30.2672&longitude=-97.7431' +
-  '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m,apparent_temperature' +
-  '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
-  '&temperature_unit=fahrenheit&windspeed_unit=mph' +
-  '&timezone=America%2FChicago&forecast_days=5'
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -61,11 +54,27 @@ function Clock() {
 function Weather() {
   const [weather, setWeather] = useState(null)
   const [error, setError]     = useState(false)
+  const [city, setCity]       = useState('Austin, TX')
 
   useEffect(() => {
     async function fetch_() {
       try {
-        const res  = await fetch(WEATHER_URL)
+        // Load location from settings
+        const general = await getSetting('general')
+        const lat     = general?.location?.lat  || 30.2672
+        const lon     = general?.location?.lon  || -97.7431
+        const cityName = general?.location?.city || 'Austin, TX'
+        setCity(cityName)
+
+        const url =
+          'https://api.open-meteo.com/v1/forecast' +
+          `?latitude=${lat}&longitude=${lon}` +
+          '&current=temperature_2m,weathercode,windspeed_10m,relativehumidity_2m,apparent_temperature' +
+          '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max' +
+          '&temperature_unit=fahrenheit&windspeed_unit=mph' +
+          '&timezone=America%2FChicago&forecast_days=5'
+
+        const res  = await fetch(url)
         const data = await res.json()
         setWeather(data)
       } catch { setError(true) }
@@ -84,7 +93,7 @@ function Weather() {
 
   return (
     <div className="dash-widget dash-weather">
-      <div className="dash-stats-title">Austin, TX</div>
+      <div className="dash-stats-title">{city}</div>
       <div className="weather-current">
         <div className="weather-icon">{now.icon}</div>
         <div className="weather-temp">{Math.round(c.temperature_2m)}&deg;</div>
