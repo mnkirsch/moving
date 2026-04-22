@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useHub } from '../context/HubContext'
 import SportsCarousel from '../components/SportsCarousel'
+import { getClimate, getScenes, triggerScene, isReady } from '../lib/ha'
 
 const WEATHER_URL =
   'https://api.open-meteo.com/v1/forecast' +
@@ -149,6 +150,7 @@ function QuickLinks({ setView }) {
     { id: 'shopping',  label: 'Shopping list' },
     { id: 'purchases', label: 'Purchases' },
     { id: 'sports',    label: 'Sports' },
+    { id: 'home', label: 'Home controls' },
   ]
   return (
     <div className="dash-widget">
@@ -164,6 +166,57 @@ function QuickLinks({ setView }) {
   )
 }
 
+function HomeWidget({ setView }) {
+  const [climate, setClimate] = useState(null)
+  const [active, setActive]   = useState(null)
+  const scenes = getScenes()
+
+  useEffect(() => {
+    async function load() {
+      const data = await getClimate()
+      setClimate(data)
+    }
+    load()
+    const t = setInterval(load, 30000)
+    return () => clearInterval(t)
+  }, [])
+
+  async function trigger(scene) {
+    setActive(scene.id)
+    await triggerScene(scene.id)
+    setTimeout(() => setActive(null), 3000)
+  }
+
+  return (
+    <div className="dash-widget dash-home-widget">
+      <div className="dash-stats-title">
+        Home {!isReady() && <span style={{ opacity: 0.4 }}>(mock)</span>}
+      </div>
+      {climate && (
+        <div className="dash-home-climate">
+          <span className="dash-home-temp">{climate.current}&deg;</span>
+          <span className="dash-home-target">Set {climate.target}&deg; &middot; {climate.mode}</span>
+        </div>
+      )}
+      <div className="dash-home-scenes">
+        {scenes.map(s => (
+          <button
+            key={s.id}
+            className={`dash-scene-btn ${active === s.id ? 'active' : ''}`}
+            onClick={() => trigger(s)}
+            title={s.label}
+          >
+            {s.icon}
+          </button>
+        ))}
+      </div>
+      <button className="dash-link-btn" style={{ marginTop: '8px' }} onClick={() => setView('home')}>
+        All controls <span>&#8594;</span>
+      </button>
+    </div>
+  )
+}
+
 export default function Dashboard({ setView }) {
   return (
     <div id="view-dashboard" className="view active">
@@ -174,6 +227,7 @@ export default function Dashboard({ setView }) {
       <div className="dash-widget">
         <SportsCarousel />
       </div>
+      <HomeWidget setView={setView} />
     </div>
   )
 }

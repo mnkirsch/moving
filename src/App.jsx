@@ -5,6 +5,8 @@ import Rooms from './pages/Rooms'
 import Shopping from './pages/Shopping'
 import Purchases from './pages/Purchases'
 import SportsDashboard from './pages/SportsDashboard'
+import HomeAssistant from './pages/HomeAssistant'
+
 
 export default function App() {
   const [view, setView] = useState('dashboard')
@@ -15,6 +17,7 @@ export default function App() {
 
   const pages = {
     dashboard: <Dashboard setView={setView} />,
+    home: <HomeAssistant />,
     rooms:     <Rooms />,
     shopping:  <Shopping />,
     purchases: <Purchases />,

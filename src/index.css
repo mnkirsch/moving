@@ -764,3 +764,78 @@ body.dash-mode .hero { display: none; }
 #view-dashboard .sports-widget-full {
   grid-column: 1 / -1;
 }
+
+
+
+/* ── Home Assistant ── */
+.ha-page { padding: 1.5rem 2rem; }
+.ha-page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px; }
+.ha-page-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+.ha-offline-banner { font-size: 12px; color: var(--accent-dark); background: var(--accent-light); padding: 6px 12px; border-radius: 8px; }
+.ha-mock-badge { font-size: 10px; background: var(--accent-light); color: var(--accent-dark); padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.ha-loading { font-size: 13px; color: var(--ink-faint); padding: 1rem; text-align: center; font-style: italic; }
+
+.ha-top-row { display: grid; grid-template-columns: 300px 1fr; gap: 1rem; margin-bottom: 1rem; }
+.ha-rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+
+.ha-card { background: var(--warm-white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.ha-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.ha-card-title { font-size: 14px; font-weight: 500; color: var(--ink); }
+
+/* Thermostat */
+.ha-thermo-body { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.ha-thermo-current { text-align: center; }
+.ha-thermo-current-num { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: var(--ink); line-height: 1; display: block; }
+.ha-thermo-current-lbl { font-size: 11px; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.05em; }
+.ha-thermo-target { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ha-thermo-target-num { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--accent); }
+.ha-thermo-btn { background: var(--cream); border: 1px solid var(--border); border-radius: 8px; width: 32px; height: 32px; font-size: 18px; cursor: pointer; color: var(--ink); }
+.ha-thermo-btn:hover { background: var(--border); }
+.ha-thermo-meta { font-size: 12px; color: var(--ink-faint); text-align: center; }
+.ha-thermo-modes { display: flex; gap: 6px; }
+.ha-mode-btn { flex: 1; font-size: 12px; font-weight: 500; padding: 6px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--ink-light); cursor: pointer; text-transform: capitalize; transition: all 0.15s; }
+.ha-mode-btn:hover { background: var(--cream); }
+.ha-mode-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* Scenes */
+.ha-scenes { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; }
+.ha-scene-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 8px; border-radius: 10px; border: 1px solid var(--border); background: var(--cream); cursor: pointer; transition: all 0.15s; }
+.ha-scene-btn:hover { background: var(--accent-light); border-color: var(--accent); }
+.ha-scene-btn.active { background: var(--accent); border-color: var(--accent); }
+.ha-scene-btn.active .ha-scene-label { color: white; }
+.ha-scene-icon { font-size: 20px; }
+.ha-scene-label { font-size: 11px; font-weight: 500; color: var(--ink-light); text-align: center; }
+
+/* Devices */
+.ha-device-group { margin-bottom: 12px; }
+.ha-device-group:last-child { margin-bottom: 0; }
+.ha-device-group-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin-bottom: 8px; }
+.ha-device { padding: 8px 10px; border-radius: 8px; background: var(--cream); margin-bottom: 6px; transition: background 0.2s; }
+.ha-device:last-child { margin-bottom: 0; }
+.ha-device.on { background: var(--accent-light); }
+.ha-device-row { display: flex; align-items: center; justify-content: space-between; }
+.ha-device-label { font-size: 13px; color: var(--ink); }
+
+/* Toggle switch */
+.ha-toggle { width: 40px; height: 22px; border-radius: 11px; border: none; background: var(--border); cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+.ha-toggle.on { background: var(--accent); }
+.ha-toggle-thumb { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 0.2s; display: block; }
+.ha-toggle.on .ha-toggle-thumb { transform: translateX(18px); }
+
+/* Brightness slider */
+.ha-brightness { width: 100%; margin-top: 8px; accent-color: var(--accent); }
+
+/* All on/off */
+.ha-all-toggle { font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--ink-light); cursor: pointer; transition: all 0.15s; }
+.ha-all-toggle:hover { background: var(--cream); }
+.ha-all-toggle.on { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
+
+.dash-home-widget { display: flex; flex-direction: column; gap: 10px; }
+.dash-home-climate { display: flex; align-items: baseline; gap: 10px; }
+.dash-home-temp { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: #F7F4EE; line-height: 1; }
+.dash-home-target { font-size: 12px; color: rgba(255,255,255,0.3); }
+.dash-home-scenes { display: flex; gap: 8px; flex-wrap: wrap; }
+.dash-scene-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.25); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.dash-scene-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
+.dash-scene-btn.active { background: rgba(193,127,69,0.3); border-color: var(--accent); }
+
