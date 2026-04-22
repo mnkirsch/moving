@@ -7,10 +7,16 @@ import Purchases from './pages/Purchases'
 import SportsDashboard from './pages/SportsDashboard'
 import HomeAssistant from './pages/HomeAssistant'
 import Settings from './pages/Settings'
+import { loadHAConfig } from './lib/ha'
+
 
 export default function App() {
   const [view, setView]         = useState('dashboard')
   const [editMode, setEditMode] = useState(false)
+
+  useEffect(() => {
+    loadHAConfig()
+  }, [])
 
   useEffect(() => {
     document.body.classList.toggle('dash-mode', view === 'dashboard')

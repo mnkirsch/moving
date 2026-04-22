@@ -197,6 +197,15 @@ function HASettings() {
     }
   }
 
+  async function save() {
+    await updateSetting('ha', values)
+    setSaved(true)
+    setTimeout(() => {
+      setSaved(false)
+      window.location.reload()
+    }, 1500)
+  }
+
   return (
     <Section title="Home Assistant">
       <p className="settings-hint">

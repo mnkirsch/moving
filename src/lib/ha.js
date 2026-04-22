@@ -5,9 +5,24 @@
 // is returned automatically.
 // ─────────────────────────────────────────
 
-const HA_URL   = import.meta.env.VITE_HA_URL
-const HA_TOKEN = import.meta.env.VITE_HA_TOKEN
-const READY    = !!(HA_URL && HA_TOKEN)
+import { getSetting } from './settings'
+
+// Runtime config — loaded from Supabase settings, falls back to .env
+let HA_URL   = import.meta.env.VITE_HA_URL   || ''
+let HA_TOKEN = import.meta.env.VITE_HA_TOKEN || ''
+let READY    = !!(HA_URL && HA_TOKEN)
+
+export async function loadHAConfig() {
+  try {
+    const config = await getSetting('ha')
+    if (config?.url && config?.token) {
+      HA_URL   = config.url
+      HA_TOKEN = config.token
+      READY    = true
+    }
+  } catch { /* use .env fallback */ }
+}
+
 
 // ── Mock state ──
 const MOCK_STATE = {
