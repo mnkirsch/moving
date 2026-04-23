@@ -267,24 +267,16 @@ export default function Dashboard({ setView, editMode }) {
     calendar: { visible: true },
   })
   const containerRef          = useRef(null)
-  const [gridWidth, setGridWidth] = useState(window.innerWidth)
+  const [gridWidth, setGridWidth] = useState(window.innerWidth - 32)
 
-  useEffect(() => {
-    getSetting('dashboard_layout').then(v => { if (v?.layout) setLayout(v.layout) })
-    getSetting('dashboard').then(v => { if (v?.widgets) setWidgets(v.widgets) })
-    const ch1 = subscribeSettings('dashboard_layout', v => { if (v?.layout) setLayout(v.layout) })
-    const ch2 = subscribeSettings('dashboard', v => { if (v?.widgets) setWidgets(v.widgets) })
-    return () => { ch1.unsubscribe(); ch2.unsubscribe() }
-  }, [])
 
-  useEffect(() => {
-    if (!containerRef.current) return
-    const observer = new ResizeObserver(entries => {
-      setGridWidth(entries[0].contentRect.width)
-    })
-    observer.observe(containerRef.current)
-    return () => observer.disconnect()
-  }, [])
+ useEffect(() => {
+  function handleResize() {
+    setGridWidth(window.innerWidth - 32)
+  }
+  window.addEventListener('resize', handleResize)
+  return () => window.removeEventListener('resize', handleResize)
+}, [])
 
   async function onLayoutChange(newLayout) {
     if (!editMode) return
@@ -315,7 +307,7 @@ export default function Dashboard({ setView, editMode }) {
           Drag and resize widgets — click Lock when done
         </div>
       )}
-      <div ref={containerRef}>
+      <div> 
         <GridLayout
           layout={visibleLayout}
           cols={12}

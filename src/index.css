@@ -966,5 +966,18 @@ body.dash-mode .hero { display: none; }
 .calendar-event-title { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; }
 
 
+#view-dashboard {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  padding: 0;
+}
 
+#view-dashboard .react-grid-layout {
+  width: 100% !important;
+}
 
+#view-dashboard {
+  display: block !important;
+  width: 100%;
+  padding: 0 1rem;
+}
