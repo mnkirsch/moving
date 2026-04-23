@@ -16,6 +16,7 @@ const WIDGET_LABELS = {
   home:    'Home controls',
   links:   'Quick links',
   calendar: 'Calendar',
+  notes: 'Sticky notes',
 }
 
 // ── Section wrapper ──

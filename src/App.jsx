@@ -8,6 +8,7 @@ import SportsDashboard from './pages/SportsDashboard'
 import HomeAssistant from './pages/HomeAssistant'
 import Settings from './pages/Settings'
 import { loadHAConfig } from './lib/ha'
+import { supabase } from './lib/supabase'
 
 
 export default function App() {
@@ -33,10 +34,34 @@ export default function App() {
     settings:  <Settings />,
   }
 
+  const [notification, setNotification] = useState(null)
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('notes-notify')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'notes'
+      }, payload => {
+        setNotification(payload.new)
+      })
+      .subscribe()
+    return () => supabase.removeChannel(channel)
+  }, [])
+
+
   return (
-    <>
-      <Nav view={view} setView={setView} editMode={editMode} setEditMode={setEditMode} />
-      {pages[view]}
-    </>
-  )
+  <>
+    <Nav view={view} setView={setView} editMode={editMode} setEditMode={setEditMode} />
+    {notification && (
+      <div className="note-notification" onClick={() => setNotification(null)}>
+        <span className="note-notification-author">{notification.author}</span>
+        <span className="note-notification-message">{notification.message}</span>
+        <span className="note-notification-close">×</span>
+      </div>
+    )}
+    {pages[view]}
+  </>
+)
 }

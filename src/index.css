@@ -981,3 +981,64 @@ body.dash-mode .hero { display: none; }
   width: 100%;
   padding: 0 1rem;
 }
+
+
+
+
+/* ── Sticky notes ── */
+.sticky-note-widget { display: flex; flex-direction: column; height: 100%; gap: 10px; }
+.sticky-notes-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.sticky-empty { font-size: 13px; color: rgba(255,255,255,0.2); font-style: italic; text-align: center; padding: 1rem 0; }
+.sticky-note { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 12px; }
+.sticky-note-message { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.5; margin-bottom: 6px; }
+.sticky-note-meta { display: flex; align-items: center; justify-content: space-between; }
+.sticky-note-author { font-size: 11px; font-weight: 500; color: var(--accent); }
+.sticky-note-time { font-size: 11px; color: rgba(255,255,255,0.2); }
+.sticky-input-row { display: flex; gap: 8px; align-items: center; }
+.sticky-author-select { font-size: 12px; padding: 6px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: rgba(255,255,255,0.6); flex-shrink: 0; }
+.sticky-input { flex: 1; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: rgba(255,255,255,0.8); }
+.sticky-input::placeholder { color: rgba(255,255,255,0.2); }
+.sticky-input:focus { outline: none; border-color: rgba(193,127,69,0.4); }
+.sticky-send { width: 32px; height: 32px; border-radius: 8px; background: var(--accent); border: none; color: white; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sticky-send:hover { background: var(--accent-dark); }
+.sticky-delete { background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.2); font-size: 14px; padding: 0 4px; border-radius: 4px; margin-left: 4px; }
+.sticky-delete:hover { background: var(--red-light); color: var(--red); }
+
+
+
+/* ── Note notification banner ── */
+.note-notification {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  cursor: pointer;
+  animation: notifyIn 0.3s cubic-bezier(0.16,1,0.3,1);
+  white-space: nowrap;
+  max-width: 90vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.note-notification-author { font-weight: 600; flex-shrink: 0; }
+.note-notification-message { opacity: 0.9; overflow: hidden; text-overflow: ellipsis; }
+.note-notification-close { opacity: 0.6; flex-shrink: 0; font-size: 16px; }
+.note-notification-close:hover { opacity: 1; }
+
+@keyframes notifyIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes notifyOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}

@@ -7,6 +7,7 @@ import GridLayout from 'react-grid-layout'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import CalendarWidget from '../components/CalendarWidget'
+import StickyNote from '../components/StickyNote'
 
 const DEFAULT_LAYOUT = [
   { i: 'clock',   x: 0, y: 0,  w: 12, h: 2 },
@@ -15,7 +16,8 @@ const DEFAULT_LAYOUT = [
   { i: 'movein',  x: 0, y: 10, w: 6,  h: 4 },
   { i: 'links',   x: 6, y: 10, w: 6,  h: 4 },
   { i: 'sports',  x: 0, y: 16, w: 12, h: 4 },
-  { i: 'calendar', x: 0, y: 22, w: 6, h: 6 },
+  { i: 'calendar', x: 0, y: 22, w: 6, h: 4 },
+  { i: 'notes', x: 6, y: 22, w: 6, h: 4 },
 ]
 
 
@@ -265,6 +267,7 @@ export default function Dashboard({ setView, editMode }) {
     home:    { visible: true },
     links:   { visible: true },
     calendar: { visible: true },
+    notes: { visible: true },
   })
   const containerRef          = useRef(null)
   const [gridWidth, setGridWidth] = useState(window.innerWidth - 32)
@@ -294,6 +297,7 @@ export default function Dashboard({ setView, editMode }) {
     links:   <QuickLinks setView={setView} />,
     sports:  <div className="dash-widget"><SportsCarousel /></div>,
     calendar: <CalendarWidget />,
+    notes: <StickyNote />,
   }
 
   const visibleLayout = layout
