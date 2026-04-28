@@ -1042,3 +1042,54 @@ body.dash-mode .hero { display: none; }
   from { opacity: 1; }
   to   { opacity: 0; }
 }
+
+
+
+/* ── Doorbell widget ── */
+.doorbell-widget { display: flex; flex-direction: column; gap: 10px; height: 100%; }
+.doorbell-header { display: flex; align-items: center; justify-content: space-between; }
+.doorbell-status { display: flex; align-items: center; gap: 5px; font-size: 11px; color: rgba(255,255,255,0.3); text-transform: capitalize; }
+.doorbell-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.doorbell-status.offline .doorbell-status-dot { background: var(--red); }
+
+.doorbell-camera {
+  flex: 1; min-height: 0;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.doorbell-placeholder { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.doorbell-cam-icon { font-size: 28px; opacity: 0.3; }
+.doorbell-cam-label { font-size: 13px; color: rgba(255,255,255,0.3); font-weight: 500; }
+.doorbell-cam-sub { font-size: 11px; color: rgba(255,255,255,0.15); }
+
+.doorbell-alert {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 500;
+  animation: fadeUp 0.3s ease;
+}
+.doorbell-alert.ring { background: rgba(193,127,69,0.3); color: #F7F4EE; }
+.doorbell-alert.motion { background: rgba(58,110,140,0.3); color: #F7F4EE; }
+
+.doorbell-events { display: flex; flex-direction: column; gap: 6px; }
+.doorbell-event {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 8px;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.doorbell-event-icon { font-size: 14px; flex-shrink: 0; }
+.doorbell-event-label { flex: 1; font-size: 12px; color: rgba(255,255,255,0.4); }
+.doorbell-event-time { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 500; }
+
+.doorbell-test-row { display: flex; gap: 8px; }
+.doorbell-test-btn {
+  flex: 1; font-size: 11px; padding: 6px;
+  border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.3);
+  cursor: pointer; transition: all 0.15s;
+}
+.doorbell-test-btn:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }

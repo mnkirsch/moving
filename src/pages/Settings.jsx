@@ -17,6 +17,7 @@ const WIDGET_LABELS = {
   links:   'Quick links',
   calendar: 'Calendar',
   notes: 'Sticky notes',
+  doorbell: 'Doorbell',
 }
 
 // ── Section wrapper ──
